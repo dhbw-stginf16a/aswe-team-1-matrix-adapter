@@ -1,0 +1,7 @@
+*.pyc
+*.pyo
+*.swp
+.vscode
+.cache
+.coverage
+infostore.something

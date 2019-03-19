@@ -2,11 +2,6 @@ from matrix_bot_api.matrix_bot_api import MatrixBotAPI
 from matrix_bot_api.mregex_handler import MRegexHandler
 from matrix_bot_api.mcommand_handler import MCommandHandler
 
-# Global variables
-MATRIX_USERNAME = ""  # Bot's username
-MATRIX_PASSWORD = ""  # Bot's password
-MATRIX_SERVER = "https://matrix.org"  # Matrix server URL
-
 class BottyMcBotface:
     def __init__(self, server, username, password):
         # This is a bit broken. We don't want to hardcode any room, so set this as soon as we get the first message.

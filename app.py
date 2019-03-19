@@ -4,9 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 import requests
-from requests.exceptions import ConnectionError
 
-import os, time
+import os
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -14,77 +13,40 @@ pp = pprint.PrettyPrinter(indent=4)
 import connexion
 from flask_cors import CORS
 
-p = None
+from prefclient import PrefStore
+PS = PrefStore("matrix_adapter", [
+    "watson_assistant_version",
+    "watson_assistant_url",
+    "watson_assistant_workspace_id",
+    "watson_assistant_username",
+    "watson_assistant_password",
 
-def get_pref(pref):
-    return p["matrix_adapter/{}".format(pref)]
+    "matrix_host",
+    "matrix_username",
+    "matrix_password",
 
-def check_pref(prefs, prefix, pref):
-    name = "{}/{}".format(prefix, pref)
-
-    if name in prefs and prefs[name] != "":
-        return True
-    else:
-        print("missing: {}".format(name))
-        return False
-
-def check_prefs(prefs):
-    required_prefs = [
-        "watson_assistant_version",
-        "watson_assistant_url",
-        "watson_assistant_workspace_id",
-        "watson_assistant_username",
-        "watson_assistant_password",
-
-        "matrix_host",
-        "matrix_username",
-        "matrix_password",
-
-        "watson_tts_url",
-        "watson_tts_apikey"
-    ]
-
-    for pref in required_prefs:
-        if check_pref(prefs, "matrix_adapter", pref) != True:
-            return False
-
-    return True
-
-while True:
-    print("Attempt to fetch preferences")
-    try:
-        r = requests.get("{}/preferences/global".format(os.environ["CENTRAL_NODE_BASE_URL"]))
-        if r.status_code == 200:
-            print("Connection established")
-            if check_prefs(r.json()):
-                p = r.json()
-                print("All required preferences configured")
-                break
-    except ConnectionError:
-        pass
-
-    time.sleep(5)
-
-
+    "watson_tts_url",
+    "watson_tts_apikey"
+])
 
 from watson_developer_cloud import AssistantV1
 WATSON = AssistantV1(
-    version = get_pref("watson_assistant_version"),
-    username = get_pref("watson_assistant_username"),
-    password = get_pref("watson_assistant_password"),
-    url = get_pref("watson_assistant_url")
+    version = PS.get_pref("watson_assistant_version"),
+    username = PS.get_pref("watson_assistant_username"),
+    password = PS.get_pref("watson_assistant_password"),
+    url = PS.get_pref("watson_assistant_url")
 )
 print(WATSON)
 
 from watson_developer_cloud import TextToSpeechV1
 TTS = TextToSpeechV1(
-    url = get_pref("watson_tts_url"),
-    iam_apikey = get_pref("watson_tts_apikey")
+    url = PS.get_pref("watson_tts_url"),
+    iam_apikey = PS.get_pref("watson_tts_apikey")
 )
 print(TTS)
 
 from bot import BottyMcBotface
-MATRIX_BOT = BottyMcBotface(get_pref("matrix_host"), get_pref("matrix_username"), get_pref("matrix_password"))
+MATRIX_BOT = BottyMcBotface(PS.get_pref("matrix_host"), PS.get_pref("matrix_username"), PS.get_pref("matrix_password"))
 
 class CentralNodeConnection:
     def __init__(self, base_url):
@@ -217,7 +179,7 @@ class MatrixAgent:
         )
 
 
-MATRIX_AGENT = MatrixAgent(CENTRAL_NODE, MATRIX_BOT, TTS, WATSON, get_pref("watson_assistant_workspace_id"))
+MATRIX_AGENT = MatrixAgent(CENTRAL_NODE, MATRIX_BOT, TTS, WATSON, PS.get_pref("watson_assistant_workspace_id"))
 
 app = connexion.App(__name__, specification_dir='openapi/')
 app.add_api('openapi.yml')

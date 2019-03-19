@@ -10,6 +10,8 @@ name = "pypi"
 connexion = {extras = ["swagger-ui"]}
 flask-cors = "*"
 gunicorn = "*"
+matrix-client = "*"
+watson-developer-cloud = "*"
 
 
 [dev-packages]

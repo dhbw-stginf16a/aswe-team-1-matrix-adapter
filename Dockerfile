@@ -6,7 +6,7 @@ RUN adduser -D flask && pip install pipenv
 
 WORKDIR /app
 
-COPY Pipfile Pipfile.lock openapi api app.py bot.py prefclient.py /app/
+ADD deploy.tar /app/
 
 RUN pipenv install --deploy --system && chown -R flask:flask /app
 

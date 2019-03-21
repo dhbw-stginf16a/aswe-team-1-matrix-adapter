@@ -52,6 +52,11 @@ class CentralNodeConnection:
     def __init__(self, base_url):
         self.base_url = base_url
 
+
+    def pref_reset(self, user_handle, input_service):
+        res = requests.delete("{}/preferences/user/{}#{}".format(self.base_url, user_handle, input_service))
+        assert (res.status_code == 200 or res.status_code == 204)
+
     def user_exists(self, user_handle, input_service):
         res = requests.post("{}/request".format(self.base_url), json = {
             "skill": "preferences",
@@ -110,8 +115,14 @@ class MatrixAgent:
         self.bot.set_reset_handler(self.reset)
         self.context = dict()
 
-    def reset(self):
-        self.context = dict()
+    def reset(self, sender, is_pref):
+        if is_pref:
+            self.context = dict()
+            self.central_node.pref_reset(sender, "matrix")
+            self.bot.send("User preferences ({}#matrix) and context reset...".format(sender))
+        else:
+            self.context = dict()
+            self.bot.send("Context reset...")
 
     def new_message(self, room, sender, content):
         print("New message: {} {} {}".format(room, sender, content))

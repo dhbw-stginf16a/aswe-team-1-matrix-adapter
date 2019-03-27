@@ -36,6 +36,22 @@ paths:
       responses:
         '204':
           description: Success
+  /proactive:
+    post:
+      tags:
+        - skill
+        - proactive
+      summary: Get dynamic information from a monitoring entity (to be called from skill)
+      description: ''
+      operationId: api.skill.proactive
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/monitorRequestPayload'
+      responses:
+        '204':
+          description: Success
 
 components:
   schemas:
@@ -43,6 +59,16 @@ components:
       type: string
       format: uuid
       example: 0693d37c-404a-423c-b802-424341ff087b
+    monitorRequestPayload:
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          example: daily_briefing
+        payload:
+          type: object
 
 externalDocs:
   description: Find out more about Swagger

@@ -189,6 +189,19 @@ class MatrixAgent:
             "m.audio"
         )
 
+    def proactive_message(self, msg):
+        print("Proactive message: {}".format(msg))
+        
+        self.context["info"] = msg
+
+        res = self.watson.message(
+            workspace_id = self.watson_workspace_id,
+            context = self.context
+        ).get_result()
+
+        self.handle_watson_response(res, msg["payload"]["user"])
+
+
 
 MATRIX_AGENT = MatrixAgent(CENTRAL_NODE, MATRIX_BOT, TTS, WATSON, PS.get_pref("watson_assistant_workspace_id"))
 

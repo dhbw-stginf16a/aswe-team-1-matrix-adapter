@@ -129,6 +129,7 @@ class MatrixAgent:
 
         # TODO: Optimize
         self.context["is_new_user"] = not self.central_node.user_exists(sender, "matrix")
+        self.context["timezone"] = "Europe/Berlin"
 
         res = self.watson.message(
             workspace_id = self.watson_workspace_id,
@@ -193,6 +194,7 @@ class MatrixAgent:
         print("Proactive message: {}".format(msg))
         
         self.context["info"] = msg
+        self.context["timezone"] = "Europe/Berlin"
 
         res = self.watson.message(
             workspace_id = self.watson_workspace_id,
